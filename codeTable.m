@@ -2,11 +2,13 @@ classdef codeTable < handle
     properties
         airportNameTable
         airportCodeTable
+        latLongTable
     end
     methods
         function this = codeTable(tableSize)
             this.airportNameTable = strings(tableSize,2);
             this.airportCodeTable = strings(tableSize,2);
+            this.latLongTable = cell(tableSize,3);
         end
         function val = hashAirport(this,key)
             val = 0;
@@ -31,7 +33,7 @@ classdef codeTable < handle
                 end
             end
         end
-        function this = insert(this,airport,code)
+        function this = insert(this,code,airport,lat,long)
             hashedAirport = this.hashAirport(char(airport));
             if this.airportNameTable(hashedAirport,1) == ""
                 this.airportNameTable(hashedAirport,1) = airport;
@@ -41,6 +43,9 @@ classdef codeTable < handle
             if this.airportCodeTable(hashedCode,1) == ""
                 this.airportCodeTable(hashedCode,1) = code;
                 this.airportCodeTable(hashedCode,2) = airport;
+                this.latLongTable(hashedCode,1) = {code};
+                this.latLongTable(hashedCode,2) = {lat};
+                this.latLongTable(hashedCode,3) = {long};
             end
         end
         function entry = getCode(this,airport)
@@ -50,6 +55,11 @@ classdef codeTable < handle
         function entry = getAirport(this,code)
             hashedCode = this.hashCode(char(code));
             entry = this.airportCodeTable(hashedCode,2);
+        end
+        function [lat,long] = getLatLong(this,code)
+            hashedCode = this.hashCode(char(code));
+            lat = this.latLongTable{hashedCode,2};
+            long = this.latLongTable{hashedCode,3};
         end
     end
 end
